@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0c0f0d">
+<title>Табло заработка — личный кабинет</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="board-header">
+    <div class="board-header__title">
+      <span class="board-header__eyebrow">LIVE PAYROLL BOARD</span>
+      <h1>Табло заработка</h1>
+    </div>
+    <div class="board-header__controls" id="headerControls"></div>
+  </header>
+
+  <main id="authSection" class="auth-wrap">
+
+    <div class="auth-tabs" role="tablist">
+      <button type="button" class="auth-tab is-active" data-tab="login">Войти</button>
+      <button type="button" class="auth-tab" data-tab="register">Регистрация</button>
+    </div>
+
+    <p class="auth-note">Аккаунт хранится в облаке — войти можно с любого устройства по логину и паролю.</p>
+
+    <form id="loginForm" class="auth-form">
+      <label>Логин
+        <input type="text" id="loginUsername" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" required>
+      </label>
+      <label>Пароль
+        <input type="password" id="loginPassword" autocomplete="current-password" required>
+      </label>
+      <button type="submit" class="btn btn--primary btn--block" id="loginBtn">Войти</button>
+      <p class="auth-error" id="loginError"></p>
+    </form>
+
+    <form id="registerForm" class="auth-form" hidden>
+      <label>Логин (латиницей, без пробелов)
+        <input type="text" id="regUsername" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" required pattern="[a-zA-Z0-9_\-\.]{2,30}">
+      </label>
+      <label>Пароль (минимум 6 символов)
+        <input type="password" id="regPassword" autocomplete="new-password" required minlength="6">
+      </label>
+      <label>Повторите пароль
+        <input type="password" id="regPassword2" autocomplete="new-password" required minlength="6">
+      </label>
+
+      <div class="auth-form__divider">О себе</div>
+
+      <label>Имя
+        <input type="text" id="regName" required>
+      </label>
+      <div class="auth-form__row">
+        <label>Возраст
+          <input type="number" id="regAge" inputmode="numeric" min="14" max="100">
+        </label>
+        <label>Должность
+          <input type="text" id="regPosition">
+        </label>
+      </div>
+      <label>Оклад в месяц, сум
+        <input type="number" id="regSalary" inputmode="numeric" min="0" step="1000">
+      </label>
+      <label>Фото (необязательно)
+        <input type="file" id="regPhoto" accept="image/*">
+      </label>
+
+      <button type="submit" class="btn btn--primary btn--block" id="registerBtn">Зарегистрироваться</button>
+      <p class="auth-error" id="registerError"></p>
+    </form>
+
+  </main>
+
+  <main id="dashboard" class="dashboard-wrap" hidden>
+
+    <section class="profile-card">
+      <div class="profile-card__top">
+        <div class="card__photo-wrap">
+          <img class="profile-photo" id="profilePhoto" src="" alt="">
+          <label class="card__photo-edit" id="profilePhotoEditBtn" title="Изменить фото" hidden>
+            📷
+            <input type="file" accept="image/*" id="profilePhotoInput" hidden>
+          </label>
+        </div>
+        <div class="profile-card__info">
+          <input class="field-input profile-name" id="profileName" data-field="name" readonly>
+          <div class="profile-meta-row">
+            <input class="field-input field-input--age" id="profileAge" data-field="age" type="number" readonly>
+            <span>лет ·</span>
+            <input class="field-input profile-position" id="profilePosition" data-field="position" readonly>
+          </div>
+        </div>
+        <button type="button" id="btnEditProfile" class="btn">✏️ Редактировать</button>
+      </div>
+
+      <div class="profile-card__salary" id="salaryEditRow" hidden>
+        <label>Оклад в месяц, UZS
+          <input type="number" id="profileSalary" inputmode="numeric" min="0" step="1000">
+        </label>
+        <button type="button" id="btnSaveProfile" class="btn btn--primary">Сохранить</button>
+      </div>
+      <p class="auth-error" id="profileError"></p>
+    </section>
+
+    <section class="controls-row">
+      <div class="currency-switch" role="group" aria-label="Валюта отображения">
+        <button type="button" class="currency-switch__btn is-active" data-currency="UZS">UZS</button>
+        <button type="button" class="currency-switch__btn" data-currency="USD">USD</button>
+        <button type="button" class="currency-switch__btn" data-currency="EUR">EUR</button>
+        <button type="button" class="currency-switch__btn" data-currency="RUB">RUB</button>
+      </div>
+      <div class="rate-status" id="rateStatus">курс: загрузка…</div>
+    </section>
+
+    <section class="period-switch" role="group" aria-label="Период отображения" id="periodSwitch">
+      <button type="button" class="period-btn" data-period="second">за секунду</button>
+      <button type="button" class="period-btn" data-period="minute">за минуту</button>
+      <button type="button" class="period-btn" data-period="hour">за час</button>
+      <button type="button" class="period-btn is-active" data-period="day">за день</button>
+      <button type="button" class="period-btn" data-period="week">за неделю</button>
+      <button type="button" class="period-btn" data-period="month">за месяц</button>
+      <button type="button" class="period-btn" data-period="year">за год</button>
+    </section>
+
+    <section class="big-counter">
+      <div class="big-counter__label" id="bigCounterLabel">НАКОПЛЕНО С НАЧАЛА ДНЯ</div>
+      <div class="big-counter__value" id="bigCounterValue">—</div>
+      <div class="card__progress"><div class="card__progress-bar" id="bigCounterProgress"></div></div>
+      <div class="big-counter__sub" id="bigCounterSub"></div>
+    </section>
+
+    <section class="all-rates">
+      <h2>Все ставки (в среднем)</h2>
+      <div class="card__rates">
+        <div class="rate-row"><span class="rate-row__label">за секунду</span><span class="rate-row__value" data-role="rate-second"></span></div>
+        <div class="rate-row"><span class="rate-row__label">за минуту</span><span class="rate-row__value" data-role="rate-minute"></span></div>
+        <div class="rate-row"><span class="rate-row__label">за час</span><span class="rate-row__value" data-role="rate-hour"></span></div>
+        <div class="rate-row"><span class="rate-row__label">за день</span><span class="rate-row__value" data-role="rate-day"></span></div>
+        <div class="rate-row"><span class="rate-row__label">за неделю</span><span class="rate-row__value" data-role="rate-week"></span></div>
+        <div class="rate-row"><span class="rate-row__label">за месяц</span><span class="rate-row__value" data-role="rate-month"></span></div>
+        <div class="rate-row"><span class="rate-row__label">за год</span><span class="rate-row__value" data-role="rate-year"></span></div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="board-footer"><p>Средние значения считаются из месячного оклада (месяц ≈ 30.44 дня). Курсы — ЦБ Узбекистана, запасной источник — открытый API.</p></footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
